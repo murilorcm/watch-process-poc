@@ -9,13 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
-fun App() {
+fun App(dir: File? = null) {
     var processMessage by remember { mutableStateOf(State.RUN.message) }
 
     var isProcessRunning by remember { mutableStateOf(false) }
 
+    AnotherProcess.fillInitials(dir)
     Box(
         modifier = Modifier
             .fillMaxSize()

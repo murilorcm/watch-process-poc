@@ -11,7 +11,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                App()
+                val dir = getExternalFilesDir(null)
+                App(dir)
             }
         }
     }
