@@ -1,65 +1,35 @@
 package br.com.murilorcm.common
 
+import br.com.murilorcm.common.Utils.Companion.getOsType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.*
-import java.util.regex.Pattern
 
-object AnotherProcess {
-    private var dir: File? = null
+class AnotherProcess(env: File) {
 
-    private val env by lazy {
-        when {
-            System.getProperty("os.name").lowercase(Locale.getDefault())
-                .contains("win") -> File("C:\\Users\\muril\\git\\env\\windo\\")
-
-            System.getProperty("java.runtime.name").lowercase(Locale.getDefault()).contains("android") -> {
-                dir
-            }
-
-            else -> null
-        }
+    companion object {
+        private var process: Process? = null
     }
 
-    private val command by lazy {
-        when {
-            System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win") -> {
-                "common/src/commonMain/resources/criar-arquivo-0-10000.exe"
-            }
-
-            System.getProperty("java.runtime.name").lowercase(Locale.getDefault()).contains("android") -> {
-                "/criar-arquivo-0-10000"
-            }
-
-            else -> null
-        }
+    private val resourceName = when (getOsType()) {
+        OSType.WINDOWS -> "criar-arquivo-0-10000.exe"
+        OSType.ANDROID -> "criar-arquivo-0-10000.so"
     }
 
-    private var process: Process? = null
-    private val outputFile by lazy {
-        File(env, "log.txt")
-    }
+    private val command = ExtractResoruce().getExtractedResources(resourceName, env.absolutePath)
+    private val outputFile = File(env, "log.txt")
 
     fun executeProcess() {
         if (command != null) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-
-                    val a = ResourceList().getResources(Pattern.compile(".*criar.*"))
-
-                    a.forEach {
-                        println(it)
-                    }
-
                     process = ProcessBuilder().run {
                         redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
                         redirectError(ProcessBuilder.Redirect.appendTo(outputFile))
                         command(command)
                         start()
                     }
-
                 } catch (e: Exception) {
                     println(e.message)
                 }
@@ -73,9 +43,5 @@ object AnotherProcess {
 
     fun onDestroy() {
         process?.destroy()
-    }
-
-    fun fillInitials(dir: File?) {
-        this.dir = dir
     }
 }

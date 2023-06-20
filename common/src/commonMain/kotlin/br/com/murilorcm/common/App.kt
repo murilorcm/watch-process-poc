@@ -12,12 +12,13 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
-fun App(dir: File? = null) {
+fun App(dir: File) {
     var processMessage by remember { mutableStateOf(State.RUN.message) }
 
     var isProcessRunning by remember { mutableStateOf(false) }
 
-    AnotherProcess.fillInitials(dir)
+    val anotherProcess = AnotherProcess(dir)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -30,14 +31,14 @@ fun App(dir: File? = null) {
         ) {
             Button(onClick = {
                 if (isProcessRunning) {
-                    AnotherProcess.onDestroy()
+                    anotherProcess.onDestroy()
                     processMessage = State.RUN.message
 
 
                     isProcessRunning = false
                 } else {
-                    AnotherProcess.executeProcess()
-                    processMessage = State.STOP.message + AnotherProcess.processStatus().first
+                    anotherProcess.executeProcess()
+                    processMessage = State.STOP.message + anotherProcess.processStatus().first
 
                     isProcessRunning = true
                 }
@@ -62,7 +63,7 @@ fun App(dir: File? = null) {
 
     rememberCoroutineScope().launch {
         while (true) {
-            val processStaus = AnotherProcess.processStatus()
+            val processStaus = anotherProcess.processStatus()
             isProcessRunning = processStaus.second ?: false
 
             processMessage = if (isProcessRunning) {
@@ -78,5 +79,5 @@ fun App(dir: File? = null) {
 
 enum class State(val button: String, val message: String) {
     RUN("Run", "waiting..."),
-    STOP("Stop", "running in:")
+    STOP("Stop", "running:")
 }

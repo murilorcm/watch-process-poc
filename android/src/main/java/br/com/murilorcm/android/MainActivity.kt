@@ -12,7 +12,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MaterialTheme {
                 val dir = getExternalFilesDir(null)
-                App(dir)
+
+                App(dir!!)
             }
         }
     }
